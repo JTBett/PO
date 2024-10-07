@@ -1,16 +1,20 @@
 package hva.animals;
 
+import java.io.Serial;
+import java.io.Serializable;
+
 import hva.habitats.Habitat;
 import hva.satisfactionStrategies.AnimalSatisfactionStrategy;
 import hva.satisfactionStrategies.SatisfactionStrategy;
 
 
-public class Animal {
+public class Animal implements Serializable{
     
+    //@Serial
+    //private static final long serialVersionUID = ;
+
     private String _keyIdAnimal;
-
     private String _name;
-
     private String _speciesId;
 
     private Habitat _habitat;
@@ -18,12 +22,16 @@ public class Animal {
     private SatisfactionStrategy _satisfactionStrategy;
 
     
-    public Animal() {
-        //TODO: constructor arguments
-        //TODO: constructor itself
+    public Animal(String keyId, String name, String speciesId, Habitat habitat) {
+        this._keyIdAnimal = keyId;
+        this._name = name;
+        this._speciesId = speciesId;
+        this._habitat = habitat;
         this._satisfactionStrategy = new AnimalSatisfactionStrategy(this);
     }
     
+    
+    public String getKeyId() { return this._keyIdAnimal; }
 
     public String getSpeciesId() { return this._speciesId; }
 

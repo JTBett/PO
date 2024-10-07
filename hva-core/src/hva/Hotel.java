@@ -1,9 +1,17 @@
 package hva;
 
-import hva.exceptions.*;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+
+import hva.exceptions.DuplicateSpeciesKeyException;
+import hva.exceptions.DuplicateSpeciesNameException;
+import hva.exceptions.DuplicateAnimalKeyException;
+import hva.exceptions.ImportFileException;
+import hva.exceptions.InvalidEntryException;
+import hva.exceptions.UnknownHabitatKeyException;
+import hva.exceptions.UnknownSpeciesKeyException;
+import hva.exceptions.UnrecognizedEntryException;
 
 
 import hva.habitats.Habitat;
@@ -51,7 +59,7 @@ public class Hotel implements Serializable {
     /**
     * Stores the hotels's trees, sorted by their key.
     */
-    private Map<String, TreeonHabitat> _trees /*= new TreeMap<>()*/;
+    private Map<String, Trees> _trees /*= new TreeMap<>()*/;
     
     /**
     * Stores the hotels's employees, sorted by their key.
@@ -100,7 +108,7 @@ public class Hotel implements Serializable {
                 fromFileParser(line.split("\\|"));
             }
         } 
-        catch (IOException | UnrecognizedEntryException /* FIXME maybe other exceptions */ e) {
+        catch (IOException | UnrecognizedEntryException | InvalidEntryException /* FIXME maybe other exceptions */ e) {
             throw new ImportFileException(filename, e);
         }
     }
@@ -108,13 +116,16 @@ public class Hotel implements Serializable {
 
 
     /**
-     * -description
+     * Parse and import an entry (line) via text file.
      *
-     * @param
-     * @throws UnrecognizedEntryException if input format not recognized.
+     * @param args The parsed arguments of the entry to import, split by "|".
+     * 
+     * @throws UnrecognizedEntryException if entry format is not recognized.
+     * @throws InvalidEntryException if the entry doesn't correspond
+     *                               to the class' required fields
      */    
     private void fromFileParser (String[] args) 
-            throws UnrecognizedEntryException {
+            throws UnrecognizedEntryException, InvalidEntryException {
         switch (args[0]) {
             case "ESPÉCIE" -> this.fromFileSpecies(args);
             case "ANIMAL" -> this.fromFileAnimal(args);
@@ -128,54 +139,74 @@ public class Hotel implements Serializable {
 
 
     /**
-     * -description
-     *
-     * @param
-     * @throws InvalidInputException Ex: wrong instanceof for arg
+     * Parse and import a Species entry via text file.
+     * {@code ESPÉCIE|id|nome}
+     * 
+     * @param args The parsed arguments of the entry to import, split by "|".
+     * 
+     * @throws InvalidEntryException if the entry doesn't correspond
+     *                               to the class' required fields
      */    
-    private void fromFileSpecies (String[] args) {
+    private void fromFileSpecies (String[] args) throws InvalidEntryException {
         if (args.length != 3) {
-            throw new InvalidInputException(args);
+            throw new InvalidEntryException(args);
         }
+
         try {
-            this.registerSpecies(args[1], args[2]);
+            this.registerSpeciesfromFile(args[1], args[2]);
         }
         catch (DuplicateSpeciesKeyException | DuplicateSpeciesNameException e) {
-            throw new InvalidInputException(args);
+            throw new InvalidEntryException(args);
         }
     }
   
 
     /**
-     * -description
-     *
-     * @param
-     * @throws UnrecognizedEntryException Ex: wrong number of fields
-     * @throws InvalidInputException Ex: wrong instanceof for arg
+     * Parse and import a Animal entry via text file.
+     * {@code ANIMAL|id|nome|idEspécie|idHabitat}
+     * 
+     * @param args The parsed arguments of the entry to import, split by "|".
+     * 
+     * @throws InvalidEntryException if the entry doesn't correspond
+     *                               to the class' required fields
      */    
-    private void fromFileAnimal (String[] args) {
-        registerAnimal(null, null, null, null);
+    private void fromFileAnimal (String[] args) throws InvalidEntryException {
+        if (args.length != 5) {
+            throw new InvalidEntryException(args);
+        }
+
+        try {
+            this.registerAnimalfromFile(args[1], args[2], args[3], args[4]);        
+        }
+        catch (DuplicateAnimalKeyException | UnknownSpeciesKeyException |
+             UnknownHabitatKeyException e) {
+            throw new InvalidEntryException(args);
+        }
     }
   
 
     /**
-     * -description
-     *
-     * @param
-     * @throws UnrecognizedEntryException Ex: wrong number of fields
-     * @throws InvalidInputException Ex: wrong instanceof for arg
-     */    
+     * Parse and import a Habitat entry via text file.
+     * {@code HABITAT|id|nome|área|idÁrvore1,...,idÁrvoreN}
+     * 
+     * @param args The parsed arguments of the entry to import, split by "|".
+     * 
+     * @throws InvalidEntryException if the entry doesn't correspond
+     *                               to the class' required fields
+     */ 
     private void fromFileHabitat (String[] args) {
         registerHabitat(null, null, 0);
     }
   
 
     /**
-     * -description
-     *
-     * @param
-     * @throws UnrecognizedEntryException Ex: wrong number of fields
-     * @throws InvalidInputException Ex: wrong instanceof for arg
+     * Parse and import a Tree entry via text file.
+     * {@code ÁRVORE|id|nome|idade|dificuldade|tipo}
+     * 
+     * @param args The parsed arguments of the entry to import, split by "|".
+     * 
+     * @throws InvalidEntryException if the entry doesn't correspond
+     *                               to the class' required fields
      */    
     private void fromFileTree (String[] args) {
         registerTree(null, null, null, 0, 0, null);
@@ -183,23 +214,28 @@ public class Hotel implements Serializable {
   
 
     /**
-     * -description
-     *
-     * @param
-     * @throws UnrecognizedEntryException Ex: wrong number of fields
-     * @throws InvalidInputException Ex: wrong instanceof for arg
-     */    
+     * Parse and import a Employee entry via text file.
+     * {@code TRATADOR|id|nome|idHabitat1,...,idHabitatN}
+     * {@code VETERINÁRIO|id|nome|idEspécie1,...,idEspécieN}
+     * 
+     * @param args The parsed arguments of the entry to import, split by "|".
+     * 
+     * @throws InvalidEntryException if the entry doesn't correspond
+     *                               to the class' required fields
+     */      
     private void fromFileEmployee (String[] args) {
         registerEmployee(null, null, null);
     }
   
 
     /**
-     * -description
-     *
-     * @param
-     * @throws UnrecognizedEntryException Ex: wrong number of fields
-     * @throws InvalidInputException Ex: wrong instanceof for arg
+     * Parse and import a Vaccine entry via text file.
+     * {@code VACINA|id|nome|idEspécie1,…,idEspécieN}
+     * 
+     * @param args The parsed arguments of the entry to import, split by "|".
+     * 
+     * @throws InvalidEntryException if the entry doesn't correspond
+     *                               to the class' required fields
      */    
     private void fromFileVaccine (String[] args) {
         registerVaccine(null, null, null);
@@ -211,28 +247,69 @@ public class Hotel implements Serializable {
     /*--START-----------------REGISTRATION FUNCTIONS-------------------------*/
 
     /**
-    * -description
+    * Register a new Species to this Hotel.
     *
-    * @param
+    * @param keyId The Id of the species.
+    * @param name The name of the species.
+    * @return The created {@link Species} instance.
+    *
+    * @throws DuplicateSpeciesKeyException
+    * @throws DuplicateSpeciesNameException 
     */
-    public void registerSpecies(String keyId, String name) {
-        //TODO: verify fields
-        //TODO: return new Vet();
+    public Species registerSpeciesfromFile(String keyId, String name)
+                throws DuplicateSpeciesKeyException, DuplicateSpeciesNameException {
+        
+        if (this.getSpeciesbyId(keyId) != null) {
+            throw new DuplicateSpeciesKeyException(keyId);
+        }
+        /*-START-can only occur via file initialization */
+        for (Species s : this.getAllSpecies()) {
+            if (s.getName().equals(name)) {
+                throw new DuplicateSpeciesNameException(name);
+            }
+        }
+        /*can only occur via file initialization-END-*/
+
+        Species s0 = new Species(keyId, name);
+        if (s0 != null) {
+            this._species.put(keyId, s0);
+        }
+        return s0;
     }
 
 
     /**
-    * -description
+    * Register a new Animal to this Hotel.
     *
-    * @param
+    * @param keyId The Id of the animal.
+    * @param name The name of the animal.
+    * @return The created {@link Animal} instance.
+    *
     * @throws DuplicateAnimalKeyException
+    * @throws UnknownSpeciesKeyException 
     * @throws UnknownHabitatKeyException
     */
-    public void registerAnimal(String keyId, String name, String speciesId,
-                                 String habitatId) {
-        //TODO: verify fields
-        //TODO: create new species if speciesId not found
-        //TODO: return new Animal();
+    public Animal registerAnimalfromFile(String keyId, String name,
+                                    String speciesId, String habitatId) 
+                throws DuplicateAnimalKeyException, UnknownSpeciesKeyException, 
+                    UnknownHabitatKeyException {
+
+        if (this.getAnimalbyId(keyId) != null) {
+            throw new DuplicateAnimalKeyException(keyId);
+        }
+        if (this.getSpeciesbyId(speciesId) == null) {
+            throw new UnknownSpeciesKeyException(speciesId);
+        }
+        if (this.getHabitatbyId(habitatId) == null) {
+            throw new UnknownHabitatKeyException(habitatId);
+        }
+        
+        Animal a0 = new Animal(keyId, name, speciesId, getHabitatbyId(habitatId));
+        if (a0 != null) {
+            getSpeciesbyId(speciesId).addAnimaltoSpecies(a0);
+            this._animals.put(keyId, a0);
+        }
+        return a0;
     }    
 
 
@@ -338,6 +415,19 @@ public class Hotel implements Serializable {
         
     /*--START--------------------LOOKUP FUNCTIONS----------------------------*/
 
+    public Species getSpeciesbyId(String speciesId) {
+        return this._species.get(speciesId);
+    }
+
+    public Animal getAnimalbyId(String animalId) {
+        return this._animals.get(animalId);
+    }
+
+    public Habitat getHabitatbyId(String habitatId) {
+        return this._habitats.get(habitatId);
+    }
+
+
     /**
     * -description
     *
@@ -380,6 +470,19 @@ public class Hotel implements Serializable {
 
     }
     /*---------------------------LOOKUP FUNCTIONS-----------------------END--*/
+
+
+    /*--START--------------SPECIES MANAGEMENT FUNCTIONS----------------------*/
+
+    /**
+    * -description
+    *
+    * @throws
+    */
+    public Collection<Species> getAllSpecies() {
+        return this._species.values();
+    }
+    /*---------------------SPECIES MANAGEMENT FUNCTIONS-----------------END--*/
 
 
     /*--START--------------ANIMAL MANAGEMENT FUNCTIONS-----------------------*/
