@@ -2,8 +2,15 @@ package hva.trees;
 
 import hva.seasons.Season;
 
-public class Caduca extends TreeonHabitat{
+public class Caduca extends Trees{
+
+    //@Serial
+    //private static final long serialVersionUID = ;
     
+    public Caduca(String keyId, String name, int age, int baseDiff) {
+        super(keyId, name, age, baseDiff);
+    }
+
     /**
     * -description
     *
