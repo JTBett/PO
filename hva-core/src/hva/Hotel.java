@@ -6,21 +6,45 @@ import java.io.IOException;
 
 import hva.exceptions.DuplicateSpeciesKeyException;
 import hva.exceptions.DuplicateSpeciesNameException;
+import hva.exceptions.DuplicateTreeKeyException;
+import hva.exceptions.DuplicateVaccineKeyException;
 import hva.exceptions.DuplicateAnimalKeyException;
+import hva.exceptions.DuplicateEmployeeKeyException;
+import hva.exceptions.DuplicateHabitatKeyException;
 import hva.exceptions.ImportFileException;
 import hva.exceptions.InvalidEntryException;
+import hva.exceptions.NoResponsabilityException;
+import hva.exceptions.UnknownAnimalKeyException;
+import hva.exceptions.UnknownEmployeeKeyException;
+import hva.exceptions.UnknownEmployeeSpecialtyException;
 import hva.exceptions.UnknownHabitatKeyException;
 import hva.exceptions.UnknownSpeciesKeyException;
+import hva.exceptions.UnknownTreeTypeException;
+import hva.exceptions.UnknownVaccineKeyException;
 import hva.exceptions.UnrecognizedEntryException;
+import hva.exceptions.VeterinarianNotAuthorizedException;
 
 
-import hva.habitats.Habitat;
 import hva.species.Species;
 import hva.animals.Animal;
-import hva.employees.*;
-import hva.trees.*;
-import hva.vaccines.*;
-import hva.seasons.*;
+import hva.habitats.Habitat;
+
+import hva.trees.Trees;
+import hva.trees.Perene;
+import hva.trees.Caduca;
+
+import hva.vaccines.Vaccine;
+import hva.vaccines.VaccinationInstance;
+
+import hva.employees.Employee;
+import hva.employees.Zookeeper;
+import hva.employees.Vet;
+
+import hva.seasons.Season;
+import hva.seasons.Spring;
+import hva.seasons.Summer;
+import hva.seasons.Autumn;
+import hva.seasons.Winter;
 
 
 import java.io.Serial;
@@ -77,21 +101,11 @@ public class Hotel implements Serializable {
     private List<VaccinationInstance> _vaccinationHistory = new ArrayList<>();
 
 
-
     /**
-    * Current season:
-    *       0 - Spring
-    *       1 - Summer
-    *       2 - Autumn
-    *       3 - Winter
+    * Hotel's current season, spring by omission;
     */
-    private Season currentSeason;
+    private Season _currentSeason = new Spring();
 
-
-    public Hotel() {
-        //TODO: constructor
-        this.currentSeason = new Spring();  // Start in Spring
-    }
 
     /*--START-------HANDLING INITIALIZATION VIA TEXT FILE INPUT--------------*/
 
@@ -179,7 +193,7 @@ public class Hotel implements Serializable {
             this.registerAnimalfromFile(args[1], args[2], args[3], args[4]);        
         }
         catch (DuplicateAnimalKeyException | UnknownSpeciesKeyException |
-             UnknownHabitatKeyException e) {
+            UnknownHabitatKeyException e) {
             throw new InvalidEntryException(args);
         }
     }
@@ -187,15 +201,28 @@ public class Hotel implements Serializable {
 
     /**
      * Parse and import a Habitat entry via text file.
-     * {@code HABITAT|id|nome|área|idÁrvore1,...,idÁrvoreN}
+     * {@code HABITAT|id|nome|área|[idÁrvore1,...,idÁrvoreN]}
      * 
      * @param args The parsed arguments of the entry to import, split by "|".
      * 
      * @throws InvalidEntryException if the entry doesn't correspond
      *                               to the class' required fields
      */ 
-    private void fromFileHabitat (String[] args) {
-        registerHabitat(null, null, 0);
+    private void fromFileHabitat (String[] args) throws InvalidEntryException {
+
+        if (args.length != 4 && args.length != 5) {
+            throw new InvalidEntryException(args);
+        }
+
+        try {
+            int area = Integer.parseInt(args[3]);
+
+            registerHabitatfromFile(args[1], args[2], area);
+        }
+        catch (NumberFormatException | DuplicateHabitatKeyException e) {
+            throw new InvalidEntryException(args);
+        }
+        //TODO: support for planted trees field
     }
   
 
@@ -208,37 +235,72 @@ public class Hotel implements Serializable {
      * @throws InvalidEntryException if the entry doesn't correspond
      *                               to the class' required fields
      */    
-    private void fromFileTree (String[] args) {
-        registerTree(null, null, null, 0, 0, null);
+    private void fromFileTree (String[] args) throws InvalidEntryException {
+        if (args.length != 6) {
+            throw new InvalidEntryException(args);
+        }
+
+        try {
+            int age = Integer.parseInt(args[3]);
+            int baseDiff = Integer.parseInt(args[4]);
+
+            this.registerTreefromFile(args[1], args[2], age, baseDiff, args[5]);        
+        }
+        catch (NumberFormatException | DuplicateTreeKeyException |
+            UnknownTreeTypeException e) {
+            throw new InvalidEntryException(args);
+        }
     }
   
 
     /**
      * Parse and import a Employee entry via text file.
-     * {@code TRATADOR|id|nome|idHabitat1,...,idHabitatN}
-     * {@code VETERINÁRIO|id|nome|idEspécie1,...,idEspécieN}
+     * {@code TRATADOR|id|nome|[idHabitat1,...,idHabitatN]}
+     * {@code VETERINÁRIO|id|nome|[idEspécie1,...,idEspécieN]}
      * 
      * @param args The parsed arguments of the entry to import, split by "|".
      * 
      * @throws InvalidEntryException if the entry doesn't correspond
      *                               to the class' required fields
      */      
-    private void fromFileEmployee (String[] args) {
-        registerEmployee(null, null, null);
+    private void fromFileEmployee (String[] args) throws InvalidEntryException {
+        if (args.length != 3 && args.length != 4) {
+            throw new InvalidEntryException(args);
+        }
+
+        try {
+            registerEmployeefromFile(args[1], args[2], args[0]);
+        }
+        catch (DuplicateEmployeeKeyException | UnknownEmployeeSpecialtyException e) {
+            throw new InvalidEntryException(args);
+        }
+
+        //TODO: support for responsabilities field
     }
   
 
     /**
      * Parse and import a Vaccine entry via text file.
-     * {@code VACINA|id|nome|idEspécie1,…,idEspécieN}
+     * {@code VACINA|id|nome|[idEspécie1,…,idEspécieN]}
      * 
      * @param args The parsed arguments of the entry to import, split by "|".
      * 
      * @throws InvalidEntryException if the entry doesn't correspond
      *                               to the class' required fields
      */    
-    private void fromFileVaccine (String[] args) {
-        registerVaccine(null, null, null);
+    private void fromFileVaccine (String[] args) throws InvalidEntryException {
+
+        if (args.length != 3 && args.length != 4) {
+            throw new InvalidEntryException(args);
+        }
+
+        try {
+            registerVaccinefromFile(args[1], args[2]);
+        }
+        catch (DuplicateVaccineKeyException e) {
+            throw new InvalidEntryException(args);
+        }
+        //TODO: support for adequate species field
     }
 
     /*--------------HANDLING INITIALIZATION VIA TEXT FILE INPUT---------END--*/
@@ -259,14 +321,12 @@ public class Hotel implements Serializable {
     public Species registerSpeciesfromFile(String keyId, String name)
                 throws DuplicateSpeciesKeyException, DuplicateSpeciesNameException {
         
-        if (this.getSpeciesbyId(keyId) != null) {
+        if (this.lookupSpeciesbyId(keyId) != null) {
             throw new DuplicateSpeciesKeyException(keyId);
         }
         /*-START-can only occur via file initialization */
-        for (Species s : this.getAllSpecies()) {
-            if (s.getName().equals(name)) {
-                throw new DuplicateSpeciesNameException(name);
-            }
+        if (this.lookupspeciesbyName(name) != null) {
+            throw new DuplicateSpeciesNameException(name);
         }
         /*can only occur via file initialization-END-*/
 
@@ -294,19 +354,19 @@ public class Hotel implements Serializable {
                 throws DuplicateAnimalKeyException, UnknownSpeciesKeyException, 
                     UnknownHabitatKeyException {
 
-        if (this.getAnimalbyId(keyId) != null) {
+        if (this.lookupAnimalbyId(keyId) != null) {
             throw new DuplicateAnimalKeyException(keyId);
         }
-        if (this.getSpeciesbyId(speciesId) == null) {
+        if (this.lookupSpeciesbyId(speciesId) == null) {
             throw new UnknownSpeciesKeyException(speciesId);
         }
-        if (this.getHabitatbyId(habitatId) == null) {
+        if (this.lookupHabitatbyId(habitatId) == null) {
             throw new UnknownHabitatKeyException(habitatId);
         }
         
-        Animal a0 = new Animal(keyId, name, speciesId, getHabitatbyId(habitatId));
+        Animal a0 = new Animal(keyId, name, speciesId, lookupHabitatbyId(habitatId));
         if (a0 != null) {
-            getSpeciesbyId(speciesId).addAnimaltoSpecies(a0);
+            lookupSpeciesbyId(speciesId).addAnimaltoSpecies(a0);
             this._animals.put(keyId, a0);
         }
         return a0;
@@ -314,117 +374,282 @@ public class Hotel implements Serializable {
 
 
     /**
-    * -description
+    * Register a new Employee to this Hotel.
     *
-    * @param
+    * @param keyId The Id of the employee.
+    * @param name The name of the employee.
+    * @param specialty The employee's specialty.
+    * @return The created {@link Employee} instance.
+    *    
     * @throws DuplicateEmployeeKeyException
+    * @throws UnknownEmployeeSpecialtyException 
     */
-    public void registerEmployee(String keyId, String name, String specialty) {
-        //TODO: verify fields
-        if(specialty == "VET")
-            registerVet(keyId, name);
-        if(specialty == "TRT")
-            registerZookeeper(keyId, name);
-    }   
+    public Employee registerEmployeefromFile(String keyId, String name,
+                                        String specialty) 
+            throws DuplicateEmployeeKeyException, UnknownEmployeeSpecialtyException {
+        
+        if (this.lookupEmployeebyId(keyId) != null) {
+            throw new DuplicateEmployeeKeyException(keyId);
+        }
+
+        Employee e0 = null;
+        switch (specialty) {
+            case "TRATADOR" -> e0 = this.registerZookeeperfromFile(keyId, name);
+            case "VETERINÁRIO" -> e0 = this.registerVetfromFile(keyId, name);
+            default -> throw new UnknownEmployeeSpecialtyException(specialty);
+        }
+
+        return e0;
+    }    
     
     /**
-    * -description
+    * Register a new Vet to this Hotel.
     *
-    * @param
+    * @param keyId The Id of the vet.
+    * @param name The name of the vet.
+    * @return The created {@link Vet} instance.
     */
-    public void registerVet(String keyId, String name) {
-        //fields have already been verified in registerEmployee
-        //TODO: return new Vet();
+    public Vet registerVetfromFile(String keyId, String name) {
+        Vet v0 = new Vet(keyId, name);
+        if (v0 != null) {
+            this._employees.put(keyId, v0);
+        }
+        return v0;
     }
 
     /**
-    * -description
+    * Register a new Zookeeper to this Hotel.
     *
-    * @param
+    * @param keyId The Id of the zookeeper.
+    * @param name The name of the zookeeper.
+    * @return The created {@link Zookeeper} instance.
     */
-    public void registerZookeeper(String keyId, String name) {
-        //fields have already been verified in registerEmployee
-        //TODO: return new Zookeeper();
+    public Zookeeper registerZookeeperfromFile(String keyId, String name) {
+        Zookeeper z0 = new Zookeeper(keyId, name);
+        if (z0 != null) {
+            this._employees.put(keyId, z0);
+        }
+        return z0;
     }
 
 
     /**
-    * -description
+    * Register a new Habitat to this Hotel.
     *
-    * @param
+    * @param keyId The Id of the habitat.
+    * @param name The name of the habitat.
+    * @param area The area of the habitat.
+    * @return The created {@link Habitat} instance.
+    *
     * @throws DuplicateHabitatKeyException
     */
-    public void registerHabitat(String keyId, String name, int area) {
-        //TODO: verify fields
-        //TODO: return new Habitat();
+    public Habitat registerHabitatfromFile(String keyId, String name, int area) 
+                throws DuplicateHabitatKeyException {
+
+        if (this.lookupHabitatbyId(keyId) != null) {
+            throw new DuplicateHabitatKeyException(keyId);
+        }
+
+        Habitat h0 = new Habitat(keyId, name, area, this.getCurrentSeason());
+        if (h0 != null) {
+            this._habitats.put(keyId, h0);
+        }
+        return h0;        
     }
 
 
     /**
-    * -description
+    * Register a new Tree to this Hotel.
     *
-    * @param
+    * @param keyId The Id of the tree.
+    * @param name The name of the tree.
+    * @param age The age of the tree.
+    * @param baseDiff The base difficulty of the tree.
+    * @param treeType The type of the tree.
+    * @return The created {@link Trees} instance.
+    *    
     * @throws DuplicateTreeKeyException
-    * @throws UnknownHabitatKeyException
+    * @throws UnknownTreeTypeException 
     */
-    public void registerTree(String habitatId, String keyId, String name,
-                                 int age, int baseDiff, String treeType) {
-        //TODO: verify fields
-        if(treeType == "CADUCA")
-            registerPerene(habitatId, keyId, name, age, baseDiff);
-        if(treeType == "PERENE")
-            registerCaduca(habitatId, keyId, name, age, baseDiff);
+    public Trees registerTreefromFile(String keyId, String name,
+                                 int age, int baseDiff, String treeType)
+                throws DuplicateTreeKeyException, UnknownTreeTypeException {
+
+        if (this.lookupTreebyId(keyId) != null) {
+            throw new DuplicateTreeKeyException(keyId);
+        }
+
+        Trees t0 = null;
+        switch (treeType) {
+            case "CADUCA" -> t0 = this.registerCaducafromFile(keyId, name, age, baseDiff);
+            case "PERENE" -> t0 = this.registerPerenefromFile(keyId, name, age, baseDiff);
+            default -> throw new UnknownTreeTypeException(treeType);
+        }
+
+        return t0;
     }   
     
     /**
-    * -description
+    * Register a new Perene tree to this Hotel.
     *
-    * @param
+    * @param keyId The Id of the perene type tree.
+    * @param name The name of the perene type tree.
+    * @param age The age of the perene type tree.
+    * @param baseDiff The base difficulty of the perene type tree.
+    * @return The created {@link Perene} instance.
     */
-    public void registerPerene(String habitatId, String keyId, String name,
+    public Perene registerPerenefromFile(String keyId, String name,
                                  int age, int baseDiff) {
-        //fields have already been verified in registerTree
-        //TODO: return new Perene();
+
+        Perene p0 = new Perene(keyId, name, age, baseDiff);
+        if (p0 != null) {
+            this._trees.put(keyId, p0);
+        }
+        return p0;
     }
 
     /**
-    * -description
+    * Register a new Caduca tree to this Hotel.
     *
-    * @param
+    * @param keyId The Id of the caduca type tree.
+    * @param name The name of the caduca type tree.
+    * @param age The age of the caduca type tree.
+    * @param baseDiff The base difficulty of the caduca type tree.
+    * @return The created {@link Caduca} instance.
     */
-    public void registerCaduca(String habitatId, String keyId, String name,
+    public Caduca registerCaducafromFile(String keyId, String name,
                                  int age, int baseDiff) {
-        //fields have already been verified in registerTree
-        //TODO: return new Caduca();
+
+        Caduca c0 = new Caduca(keyId, name, age, baseDiff);
+        if (c0 != null) {
+            this._trees.put(keyId, c0);
+        }
+        return c0;
     }
 
 
     /**
-    * -description
+    * Register a new Vaccine to this Hotel.
     *
-    * @param
-    * @throws DuplicateVAccineKeyException
-    * @throws UnknownSpeciesKeyException
+    * @param keyId The Id of the vaccine.
+    * @param name The name of the vaccine.
+    * @return The created {@link Vaccine} instance.
+    *
+    * @throws DuplicateVaccineKeyException
     */
-    public void registerVaccine(String keyId, String name, String[] speciesId) {
-        //TODO: verify fields
-        //TODO: return new Vaccine();
+    public Vaccine registerVaccinefromFile(String keyId, String name) 
+                throws DuplicateVaccineKeyException {
+
+        if (this.lookupVaccinebyId(keyId) != null) {
+            throw new DuplicateVaccineKeyException(keyId);
+        }
+
+        Vaccine v0 = new Vaccine(keyId, name);
+        if (v0 != null) {
+            this._vaccines.put(keyId, v0);
+        }
+        return v0;  
     }
     /*------------------------REGISTRATION FUNCTIONS--------------------END--*/
 
         
     /*--START--------------------LOOKUP FUNCTIONS----------------------------*/
-
-    public Species getSpeciesbyId(String speciesId) {
+    
+    /**
+    * Get the hotel's current season.
+    *
+    * @return The current {@link Season}.
+    */
+    public Season getCurrentSeason() { 
+        return this._currentSeason; 
+    }
+    
+    
+    /**
+    * Lookup a hotel's species by it's keyId.
+    *
+    * @param speciesId The Id of the species.
+    * @return The found {@link Species} or
+    *         null, if not found.
+    */
+    public Species lookupSpeciesbyId(String speciesId) {
         return this._species.get(speciesId);
     }
+    
+    /**
+    * Lookup a hotel's species by it's name.
+    *
+    * @param name The name of the species.
+    * @return The found {@link Species} or
+    *         null, if not found.
+    */
+    public Species lookupspeciesbyName(String name) {
+        for (Species s : this.getAllSpecies()) {
+            if (s.getName().equals(name)) {
+                return s;
+            }
+        }
+        return null;
+    }
+    
 
-    public Animal getAnimalbyId(String animalId) {
+    /**
+    * Lookup a hotel's animal by it's keyId.
+    *
+    * @param animalId The Id of the animal.
+    * @return The found {@link Aninal} or
+    *         null, if not found.
+    */
+    public Animal lookupAnimalbyId(String animalId) {
         return this._animals.get(animalId);
     }
-
-    public Habitat getHabitatbyId(String habitatId) {
+    
+    
+    /**
+    * Lookup a hotel's habitat by it's keyId.
+    *
+    * @param habitatId The Id of the habitat.
+    * @return The found {@link Habitat} or
+    *         null, if not found.
+    */
+    public Habitat lookupHabitatbyId(String habitatId) {
         return this._habitats.get(habitatId);
+    }
+    
+    
+    /**
+    * Lookup a hotel's tree by it's keyId.
+    *
+    * @param treeId The Id of the tree.
+    * @return The found {@link Trees} or
+    *         null, if not found.
+    */
+    public Trees lookupTreebyId(String treeId) {
+        return this._trees.get(treeId);
+    }
+    
+    
+    /**
+    * Lookup a hotel's employee by it's keyId.
+    *
+    * @param employeeId The Id of the employee.
+    * @return The found {@link Employee} or
+    *         null, if not found.
+    */
+    public Employee lookupEmployeebyId(String employeeId) {
+        return this._employees.get(employeeId);
+    }
+
+
+    /**
+    * Lookup a hotel's vaccine by it's keyId.
+    *
+    * @param vaccineId The Id of the vaccine.
+    * @return The found {@link Vaccine} or
+    *         null, if not found.
+    */
+    public Vaccine lookupVaccinebyId(String vaccineId) {
+        return this._vaccines.get(vaccineId);
     }
 
 
@@ -475,9 +700,11 @@ public class Hotel implements Serializable {
     /*--START--------------SPECIES MANAGEMENT FUNCTIONS----------------------*/
 
     /**
-    * -description
+    * Get a collection of all the hotel's species
+    * sorted by keyId.
     *
-    * @throws
+    * @return Collection<{@link Species}> containing
+    *         the hotel's species.
     */
     public Collection<Species> getAllSpecies() {
         return this._species.values();
@@ -488,12 +715,14 @@ public class Hotel implements Serializable {
     /*--START--------------ANIMAL MANAGEMENT FUNCTIONS-----------------------*/
 
     /**
-    * -description
+    * Get a collection of all the hotel's animals
+    * sorted by keyId.
     *
-    * @throws
+    * @return Collection<{@link Species}> containing
+    *         the hotel's animals.
     */
-    public void /*Collection<Animal>*/ getAllAnimals() {
-
+    public Collection<Animal> getAllAnimals() {
+        return this._animals.values();
     }
 
 
@@ -524,14 +753,31 @@ public class Hotel implements Serializable {
     /*--START-------------EMPLOYEE MANAGEMENT FUNCTIONS----------------------*/
 
     /**
-    * -description
+    * Get a collection of all the hotel's employees
+    * sorted by keyId.
     *
-    * @param
-    * @throws
+    * @return Collection<{@link Employee}> containing
+    *         the hotel's employees.
     */
-    public void /*Collection<Employee>*/ getAllEmployees() {
-
+    public Collection<Employee> getAllEmployees() {
+        return this._employees.values();
     }
+
+    /**
+    * Get a collection of all the hotel's zookepers.
+    *
+    * @return Collection<{@link Zookeeper}> containing
+    *         the hotel's zookepers.
+    */
+    //public Collection<Zookeeper> getAllZookeepers() {}
+
+    /**
+    * Get a collection of all the hotel's vets.
+    *
+    * @return Collection<{@link Vet}> containing
+    *         the hotel's vets.
+    */
+    //public Collection<Vet> getAllVets() {}
     
 
     /**
@@ -559,13 +805,23 @@ public class Hotel implements Serializable {
 
 
     /**
-    * -description
+    * Calculate an employee's current satisfaction value.
+    * @see VetSatisfactionStrategy#calcSatisfaction()
+    * @see ZookeeperSatisfactionStrategy#calcSatisfaction()
     *
-    * @param
+    * @param employeeId the {@link Employee} to modify.
+    * @return Math.round(satisfaction).
+    *
     * @throws UnknownEmployeeKeyException
     */
-    public int satisfactionbyEmployee(String employeeId) {
-        return 0;
+    public int satisfactionbyEmployee(String employeeId) 
+            throws UnknownEmployeeKeyException {
+
+        if (lookupEmployeebyId(employeeId) == null) {
+            throw new UnknownEmployeeKeyException(employeeId);
+        }
+
+        return lookupEmployeebyId(employeeId).calcSatisfaction();
     }
     /*--------------------EMPLOYEE MANAGEMENT FUNCTIONS-----------------END--*/
 
@@ -573,23 +829,32 @@ public class Hotel implements Serializable {
     /*--START--------------HABITAT MANAGEMENT FUNCTIONS----------------------*/
 
     /**
-    * -description
+    * Get a collection of all the hotel's habitats
+    * sorted by keyId.
     *
-    * @throws
+    * @return Collection<{@link Habitat}> containing
+    *         the hotel's habitats.
     */
-    public void /*Collection<Habitat>*/ getAllHabitats() {
-
+    public Collection<Habitat> getAllHabitats() {
+        return this._habitats.values();
     }
     
 
     /**
-    * -description
+    * Change an habitat's area value.
     *
-    * @param
+    * @param habitatId the {@link Habitat} to modify.
+    * @param newArea the new area value to set.
+    *
     * @throws UnknownHabitatKeyException
     */
-    public void changeHabitatArea(String habitatId, int newArea) {
+    public void changeHabitatArea(String habitatId, int newArea) 
+            throws UnknownHabitatKeyException {
 
+        if (lookupHabitatbyId(habitatId) == null) {
+            throw new UnknownHabitatKeyException(habitatId);
+        }
+        lookupHabitatbyId(habitatId).changeArea(newArea);
     }
 
     
@@ -632,12 +897,14 @@ public class Hotel implements Serializable {
     /*--START--------------VACCINE MANAGEMENT FUNCTIONS----------------------*/
     
     /**
-    * -description
+    * Get a collection of all the hotel's vaccines
+    * sorted by keyId.
     *
-    * @throws
+    * @return Collection<{@link Vaccine}> containing
+    *         the hotel's vaccines.
     */
-    public void /*Collection<Vaccine>*/ getAllVaccines() {
-
+    public Collection<Vaccine> getAllVaccines() {
+        return this._vaccines.values();
     }
 
 
@@ -656,24 +923,42 @@ public class Hotel implements Serializable {
 
     
     /**
-    * -description
+    * Get a collection of all the hotel's applied 
+    * vaccines sorted by cronological order.
     *
+    * @return List<{@link VaccinationInstance}> containing
+    *         the hotel's applied vaccines.
     */
-    public void /*List<VaccinationInstance>*/ getApliedVaccines() {
-
+    public List<VaccinationInstance> getApliedVaccines() {
+        return this._vaccinationHistory;
     }
     /*---------------------VACCINE MANAGEMENT FUNCTIONS-----------------END--*/
 
 
+
     /**
-    * -description
+    * Advances the hotel's season and returns
+    * the value respective to the current season.
     *
-    * @return
+    * @return 0 - Spring
+    *       1 - Summer
+    *       2 - Autumn
+    *       3 - Winter
     */
     public int advanceSeason() {
-        currentSeason = currentSeason.nextSeason();
-        
-        return 0;
+        this._currentSeason = this._currentSeason.nextSeason();
+
+        for (Habitat h : getAllHabitats()) {
+            h.getCurrentSeason().nextSeason();
+        }
+
+        int advSeason = -1;
+        if (this.getCurrentSeason() instanceof Spring) { advSeason = 0; }
+        if (this.getCurrentSeason() instanceof Summer) { advSeason = 1; }
+        if (this.getCurrentSeason() instanceof Autumn) { advSeason = 2; }
+        if (this.getCurrentSeason() instanceof Winter) { advSeason = 3; }
+
+        return advSeason;
     }
 
 }
