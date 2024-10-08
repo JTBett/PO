@@ -1,6 +1,5 @@
 package hva.satisfactionStrategies;
 
-import hva.habitats.Habitat;
 import hva.animals.Animal;
 
 
