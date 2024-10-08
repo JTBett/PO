@@ -15,9 +15,12 @@ public class Vet extends Employee {
     */
     private Map<String, Species> _speciesUnderResponsability /*= new TreeMap<>()*/;
 
-    public Vet() {
+    
+    public Vet(String keyId, String name) {
+        super(keyId, name);
         this.setSatisfactionStrategy(new VetSatisfactionStrategy(this));
     }
+
 
     public Collection<Species> getSpeciesunderResponsibility() {
         return this._speciesUnderResponsability.values();
@@ -47,6 +50,12 @@ public class Vet extends Employee {
     @Override
     public void removeResponsability(String responsabilityId) {
         this._speciesUnderResponsability.remove(responsabilityId);
+    }
+
+    
+    @Override
+    public int calcSatisfaction() {
+        return this.getSatisfactionStrategy().calcSatisfaction();
     }
     
 }

@@ -16,7 +16,8 @@ public class Zookeeper extends Employee {
     private Map<String, Habitat> _habitatsUnderResponsability /*= new TreeMap<>()*/;
         
     
-    public Zookeeper() {
+    public Zookeeper(String keyId, String name) {
+        super(keyId, name);
         this.setSatisfactionStrategy(new ZookeperSatisfactionStrategy(this));
     }
 
@@ -49,5 +50,11 @@ public class Zookeeper extends Employee {
     @Override
     public void removeResponsability(String responsabilityId) {
         this._habitatsUnderResponsability.remove(responsabilityId);
+    }
+
+    
+    @Override
+    public int calcSatisfaction() {
+        return this.getSatisfactionStrategy().calcSatisfaction();
     }
 }

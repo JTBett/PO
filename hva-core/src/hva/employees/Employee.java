@@ -3,13 +3,19 @@ package hva.employees;
 import hva.satisfactionStrategies.SatisfactionStrategy;
 import hva.satisfactionStrategies.VetSatisfactionStrategy;
 
-public class Employee {
+public abstract class Employee {
 
     private String _keyIdEmployee;
 
     private String _name;
 
     private SatisfactionStrategy _satisfactionStrategy;
+
+
+    public Employee(String keyId, String name) {
+        this._keyIdEmployee = keyId;
+        this._name = name;
+    }
 
 
     public void setSatisfactionStrategy(SatisfactionStrategy strategy) {
@@ -25,11 +31,9 @@ public class Employee {
      * @see VetSatisfactionStrategy#calcSatisfaction()
      * @see ZookeeperSatisfactionStrategy#calcSatisfaction()
      */
-    public int calcSatisfaction() {
-        return _satisfactionStrategy.calcSatisfaction();
-    }
+    public abstract int calcSatisfaction();
 
-    //TODO: abstract conversion
+
     /**
     * -description
     *
