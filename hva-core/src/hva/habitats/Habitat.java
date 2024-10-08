@@ -8,7 +8,7 @@ import hva.animals.Animal;
 import hva.employees.Zookeeper;
 import hva.exceptions.UnknownSpeciesKeyException;
 import hva.seasons.Season;
-import hva.trees.TreeonHabitat;
+import hva.trees.Trees;
 
 public class Habitat {
 
@@ -18,24 +18,23 @@ public class Habitat {
 
     private int _area;
 
-
     private Season _currentSeason;
 
 
     /**
     * Stores the habitat's animals, sorted by their key.
     */
-    private Map<String, Animal> _animalsonHabitat /*= new TreeMap<>()*/;
+    private Map<String, Animal> _animalsonHabitat;
         
     /**
     * Stores the habitat's trees, sorted by their key.
     */
-    private Map<String, TreeonHabitat> _treesonHabitat /*= new TreeMap<>()*/;
+    private Map<String, Trees> _trees;
 
     /**
     * Stores the zookepers that can maintain this habitat, sorted by their key.
     */
-    private Map<String, Zookeeper> _canMantain /*= new TreeMap<>()*/;
+    private Map<String, Zookeeper> _canMantain;
 
     /**
     * Stores the habitat's adequacys, sorted by their species' key.
@@ -46,16 +45,28 @@ public class Habitat {
     private Map<String, String> _speciesAdequacy;
     
 
+    public Habitat(String keyId, String name, int area, Season season) {
+        this._keyIdHabitat = keyId;
+        this._name = name;
+        this._area = area;
+        this._currentSeason = season;
+
+        this._animalsonHabitat = new TreeMap<String, Animal>();
+        this._trees = new TreeMap<String, Trees>();
+        this._canMantain = new TreeMap<String, Zookeeper>();
+    }
+    
+
+    /*--START--------------------LOOKUP FUNCTIONS----------------------------*/
+
     public int getArea() { return this._area; }
 
     public String getKeyId() { return this._keyIdHabitat; }
 
     public Season getCurrentSeason() { return this._currentSeason; }
 
-    public Collection<TreeonHabitat> getTreesonHabitat() { return this._treesonHabitat.values(); }
-
-    /*--START--------------------LOOKUP FUNCTIONS----------------------------*/
-
+    public Collection<Trees> getTreesonHabitat() { return this._trees.values(); }
+    
     /**
      * 
      * @return the total of animals in this habitat.
@@ -137,7 +148,7 @@ public class Habitat {
      *
      * @param
      */    
-    public void addTreetoHabitat(TreeonHabitat tree) {
+    public void addTreetoHabitat(Trees tree) {
     
     }
 
@@ -189,7 +200,7 @@ public class Habitat {
     public double calcWorkinHabitat() {
 
         double treeWork = 0.0;
-        for (TreeonHabitat tree : this.getTreesonHabitat()) {
+        for (Trees tree : this.getTreesonHabitat()) {
             treeWork += tree.calcWorkForSeason(this.getCurrentSeason());
         }
         double work = this.getArea() + 3 * this.numberofTotalZookeepers() + treeWork;
