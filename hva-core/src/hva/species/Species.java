@@ -3,7 +3,7 @@ package hva.species;
 import java.util.Collection;
 import java.util.Map;
 import java.util.TreeMap;
-import java.io.Serial;
+//import java.io.Serial;
 import java.io.Serializable;
 
 import hva.animals.Animal;
@@ -20,12 +20,12 @@ public class Species implements Serializable{
     /**
     * Stores the vets that can vaccinate animals from this species, sorted by their key.
     */
-    private Map<String, Vet> _authorizedVets /*= new TreeMap<>()*/;
+    private Map<String, Vet> _authorizedVets;
     
     /**
     * Stores the species's animals, sorted by their key.
     */
-    private Map<String, Animal> _animalsofSpecies /*= new TreeMap<>()*/;
+    private Map<String, Animal> _animalsofSpecies;
     
 
     public Species(String keyId, String name) { 
