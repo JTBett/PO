@@ -1,6 +1,6 @@
 package hva.animals;
 
-import java.io.Serial;
+//import java.io.Serial;
 import java.io.Serializable;
 
 import hva.habitats.Habitat;
@@ -31,11 +31,16 @@ public class Animal implements Serializable{
     }
     
     
+    /*--START--------------------LOOKUP FUNCTIONS----------------------------*/
+    
     public String getKeyId() { return this._keyIdAnimal; }
-
+    
+    public String getName() { return this._name; }
+    
     public String getSpeciesId() { return this._speciesId; }
-
+    
     public Habitat getHabitat() { return this._habitat; }
+    /*---------------------------LOOKUP FUNCTIONS-----------------------END--*/
 
 
     /**
