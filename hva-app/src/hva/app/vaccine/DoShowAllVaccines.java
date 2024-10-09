@@ -1,19 +1,23 @@
 package hva.app.vaccine;
 
 import hva.Hotel;
+import hva.app.Stringifier;
 import pt.tecnico.uilib.menus.Command;
 import pt.tecnico.uilib.menus.CommandException;
-//FIXME import other classes if needed
 
 class DoShowAllVaccines extends Command<Hotel> {
 
+    private final Stringifier stringifier = new Stringifier();
+
     DoShowAllVaccines(Hotel receiver) {
         super(Label.SHOW_ALL_VACCINES, receiver);
-	//FIXME add command fields if needed
     }
 
     @Override
-    protected final void execute() {
-        //FIXME implement command
+    protected final void execute() throws CommandException {
+        _receiver.getAllVaccines()
+            .stream()
+            .map(v -> v.accept(stringifier))
+            .forEach(_display::popup);
     }
 }
