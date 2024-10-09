@@ -18,12 +18,12 @@ public class Species implements Serializable{
     private String _name;
 
     /**
-    * Stores the vets that can vaccinate animals from this species, sorted by their key.
+    * Stores the vets that can vaccinate animals from this species.
     */
     private Map<String, Vet> _authorizedVets;
     
     /**
-    * Stores the species's animals, sorted by their key.
+    * Stores the species's animals.
     */
     private Map<String, Animal> _animalsofSpecies;
     
@@ -63,7 +63,7 @@ public class Species implements Serializable{
      * @param
      */    
     public void addVettoAuthorized(Vet vet) {
-
+        this._authorizedVets.put(vet.getKeyId(),vet);
     }
 
     /**
@@ -72,7 +72,7 @@ public class Species implements Serializable{
      * @param
      */    
     public void removeVetfromAuthorized(String vetId) {
-
+        this._authorizedVets.remove(vetId);
     }
 
 

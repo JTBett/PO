@@ -13,7 +13,13 @@ public class HotelManager {
     /** This is the current hotel. */
     private Hotel _hotel = new Hotel();
 
-    // FIXME maybe add more fields if needed
+    /** Name of the file storing current hotel. */
+    private String _filename = "";
+
+    
+    public Hotel getHotel() {
+        return this._hotel;
+    }
 
     /**
      * Saves the serialized application's state into the file associated to the current network.
@@ -23,7 +29,18 @@ public class HotelManager {
      * @throws IOException if there is some error while serializing the state of the network to disk.
      */
     public void save() throws FileNotFoundException, MissingFileAssociationException, IOException {
-        // FIXME implement serialization method
+        
+        if (this._filename == null || this._filename.isBlank()) {
+            throw new MissingFileAssociationException();
+        }
+  
+        if (this._hotel.getDirty()) {
+            try (ObjectOutputStream out = new ObjectOutputStream(
+                    new BufferedOutputStream(new FileOutputStream(this._filename)))) {
+              out.writeObject(this._hotel);
+            }
+            this._hotel.notDirty();
+        }
     }
 
     /**
@@ -34,7 +51,8 @@ public class HotelManager {
      * @throws IOException if there is some error while serializing the state of the network to disk.
      */
     public void saveAs(String filename) throws FileNotFoundException, MissingFileAssociationException, IOException {
-        // FIXME implement serialization method
+        this._filename = filename;
+        save();
     }
 
     /**
@@ -44,7 +62,16 @@ public class HotelManager {
      *         an error while processing this file.
      */
     public void load(String filename) throws UnavailableFileException {
-        // FIXME implement serialization method
+            
+        try (ObjectInputStream in = new ObjectInputStream(
+                    new BufferedInputStream(new FileInputStream(filename)))) {
+
+            this._hotel = (Hotel) in.readObject();
+            this._filename = filename;
+        } 
+        catch (IOException | ClassNotFoundException e) {
+            throw new UnavailableFileException(filename);
+        }
     }
 
     /**

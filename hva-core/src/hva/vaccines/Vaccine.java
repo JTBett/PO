@@ -1,7 +1,7 @@
 package hva.vaccines;
 
 import java.io.Serializable;
-import java.io.Serial;
+//import java.io.Serial;
 
 import java.util.Map;
 import java.util.TreeMap;
@@ -19,7 +19,7 @@ public class Vaccine implements Serializable{
     private String _name;
 
     /**
-    * Stores this vaccine's species that it can successfully vaccinate, sorted by their key.
+    * Stores this vaccine's species that it can successfully vaccinate.
     */
     private Map<String, Species> _canVaccinateSpecies;
 
@@ -29,6 +29,16 @@ public class Vaccine implements Serializable{
         this._name = name;
 
         this._canVaccinateSpecies = new TreeMap<String, Species>();
+    }
+
+
+    public String getKeyId() {return this._keyIdVaccine; }
+
+    public String getName() { return this._name; } 
+
+
+    public void savetoVaccinate(Species species) {
+        this._canVaccinateSpecies.put(species.getKeyId(), species);
     }
 
 

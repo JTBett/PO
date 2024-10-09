@@ -6,7 +6,6 @@ import java.util.TreeMap;
 
 import hva.animals.Animal;
 import hva.employees.Zookeeper;
-import hva.exceptions.UnknownSpeciesKeyException;
 import hva.seasons.Season;
 import hva.trees.Trees;
 
@@ -22,17 +21,17 @@ public class Habitat {
 
 
     /**
-    * Stores the habitat's animals, sorted by their key.
+    * Stores the habitat's animals.
     */
     private Map<String, Animal> _animalsonHabitat;
         
     /**
-    * Stores the habitat's trees, sorted by their key.
+    * Stores the habitat's trees.
     */
     private Map<String, Trees> _trees;
 
     /**
-    * Stores the zookepers that can maintain this habitat, sorted by their key.
+    * Stores the zookepers that can maintain this habitat.
     */
     private Map<String, Zookeeper> _canMantain;
 
@@ -42,7 +41,7 @@ public class Habitat {
     * "adequação é 20 se a influência do habitat for positiva, -20 se for negativa
     * e 0 se a influência for neutra (condição por omissão)".
     */
-    private Map<String, String> _speciesAdequacy;
+    //private Map<String, String> _speciesAdequacy;
     
 
     public Habitat(String keyId, String name, int area, Season season) {
@@ -63,6 +62,8 @@ public class Habitat {
 
     public String getKeyId() { return this._keyIdHabitat; }
 
+    public String getName() { return this._name; }
+
     public Season getCurrentSeason() { return this._currentSeason; }
 
     public Collection<Trees> getTreesonHabitat() { return this._trees.values(); }
@@ -78,7 +79,7 @@ public class Habitat {
     /**
      * 
      * @return the total of animal not of the species(speciesId) in this habitat.
-     * @throws UnknownSpeciesKeyException
+     * @throws 
      */     
     public int numberofDifferentAnimalsbySpecies(String speciesId) {
         return this.numberofTotalAnimals() - this.numberofAnimalsbySpecies(speciesId);
@@ -87,7 +88,7 @@ public class Habitat {
     /**
      * 
      * @return the total of animal of the same species(speciesId) in this habitat.
-     * @throws UnknownSpeciesKeyException
+     * @throws 
      */    
     public int numberofAnimalsbySpecies(String speciesId) {
         return 0;
@@ -99,7 +100,7 @@ public class Habitat {
      * @return the total of trees in this habitat.
      */    
     public int numberofTotalTrees() {
-        return 0;
+        return this._trees.size();
     }
 
 
@@ -107,17 +108,19 @@ public class Habitat {
      *
      * @return the total of zookeepers responsible for this habitat.
      */   
-    public int numberofTotalZookeepers() { return this._canMantain.size(); }
+    public int numberofTotalZookeepers() { 
+        return this._canMantain.size(); 
+    }
 
 
     /**
      * -description
      *
      * @param
-     * @throws UnknownSpeciesKeyException
+     * @throws 
      */    
     public int adequacybySpecies(String speciesId) {
-        String adequacy = this._speciesAdequacy.get(speciesId);
+        //String adequacy = this._speciesAdequacy.get(speciesId);
         return 0;
     }
     /*---------------------------LOOKUP FUNCTIONS-----------------------END--*/
@@ -149,7 +152,7 @@ public class Habitat {
      * @param
      */    
     public void addTreetoHabitat(Trees tree) {
-    
+        this._trees.put(tree.getKeyId(), tree);
     }
 
 
@@ -159,7 +162,7 @@ public class Habitat {
      * @param
      */    
     public void addAnimaltoHabitat(Animal animal) {
-
+        this._animalsonHabitat.put(animal.getKeyId(), animal);
     }
 
     /**
@@ -168,7 +171,7 @@ public class Habitat {
      * @param
      */    
     public void removeAnimalfromHabitat(String animalId) {
-
+        this._animalsonHabitat.remove(animalId);
     }
 
 
@@ -178,7 +181,7 @@ public class Habitat {
      * @param
      */    
     public void addZookeepertoHabitat(Zookeeper zookeeper) {
-
+        this._canMantain.put(zookeeper.getKeyId(), zookeeper);
     }
 
     /**
@@ -187,7 +190,7 @@ public class Habitat {
      * @param
      */    
     public void removeZookeeperfromHabitat(String zookeeperId) {
-
+        this._canMantain.remove(zookeeperId);
     }
 
 

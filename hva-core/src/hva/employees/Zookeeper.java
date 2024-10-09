@@ -5,19 +5,19 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import hva.habitats.Habitat;
-import hva.satisfactionStrategies.SatisfactionStrategy;
 import hva.satisfactionStrategies.ZookeperSatisfactionStrategy;
 
 public class Zookeeper extends Employee {
     
     /**
-    * Stores the zookeeper's habitats that it can mantain, sorted by their key.
+    * Stores the zookeeper's habitats that it can mantain.
     */
-    private Map<String, Habitat> _habitatsUnderResponsability /*= new TreeMap<>()*/;
+    private Map<String, Habitat> _habitatsUnderResponsability;
         
     
     public Zookeeper(String keyId, String name) {
         super(keyId, name);
+        this._habitatsUnderResponsability = new TreeMap<String, Habitat>();
         this.setSatisfactionStrategy(new ZookeperSatisfactionStrategy(this));
     }
 
@@ -28,24 +28,21 @@ public class Zookeeper extends Employee {
 
 
     /**
-    * -description
+    * Assign a habitat to employee.
     *
-    * @param
+    * @param responsability the habitat to assign.
     */
     @Override
     public void addResponsability(Object responsability) {
-        if (responsability instanceof Habitat) {
-            Habitat habitat = (Habitat) responsability; 
-            this._habitatsUnderResponsability.put(habitat.getKeyId(), habitat);
-        }
-        // TODO:else
+        Habitat habitat = (Habitat) responsability; 
+        this._habitatsUnderResponsability.put(habitat.getKeyId(), habitat);
     }
 
 
     /**
-    * -description
+    * Remove a habitat from zookeepers's responsabilities.
     *
-    * @param
+    * @param responsabilityId the Id of the habitat to unassign.
     */
     @Override
     public void removeResponsability(String responsabilityId) {
@@ -53,6 +50,9 @@ public class Zookeeper extends Employee {
     }
 
     
+    /**
+    * @see ZookeeperSatisfactionStrategy#calcSatisfaction()
+    */
     @Override
     public int calcSatisfaction() {
         return this.getSatisfactionStrategy().calcSatisfaction();

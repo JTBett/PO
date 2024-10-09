@@ -4,6 +4,7 @@ package hva.seasons;
 public class Spring extends Season {
 
     public Spring() {
+        this.setSeasonalValue(0);
         this.setSeasonal(1, 1);
     }
 

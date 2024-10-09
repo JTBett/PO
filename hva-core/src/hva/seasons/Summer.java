@@ -4,6 +4,7 @@ package hva.seasons;
 public class Summer extends Season {
 
     public Summer() {
+        this.setSeasonalValue(1);
         this.setSeasonal(2, 1);
     }
 

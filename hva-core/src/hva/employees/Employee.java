@@ -1,7 +1,6 @@
 package hva.employees;
 
 import hva.satisfactionStrategies.SatisfactionStrategy;
-import hva.satisfactionStrategies.VetSatisfactionStrategy;
 
 public abstract class Employee {
 
@@ -18,6 +17,11 @@ public abstract class Employee {
     }
 
 
+    public String getKeyId() { return this._keyIdEmployee; }
+
+    public String getName() { return this._name; }
+
+
     public void setSatisfactionStrategy(SatisfactionStrategy strategy) {
         this._satisfactionStrategy = strategy;
     }
@@ -26,30 +30,9 @@ public abstract class Employee {
         return this._satisfactionStrategy;
     }
 
-
-    /**
-     * @see VetSatisfactionStrategy#calcSatisfaction()
-     * @see ZookeeperSatisfactionStrategy#calcSatisfaction()
-     */
     public abstract int calcSatisfaction();
 
+    public abstract void addResponsability(Object responsability);
 
-    /**
-    * -description
-    *
-    * @param
-    */
-    public void addResponsability(Object responsability) {
-
-    }
-
-    //TODO: abstract conversion
-    /**
-    * -description
-    *
-    * @param
-    */
-    public void removeResponsability(String responsabilityId) {
-        
-    }
+    public abstract void removeResponsability(String responsabilityId);
 }

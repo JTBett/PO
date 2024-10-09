@@ -2,13 +2,13 @@ package hva.exceptions;
 
 import java.io.Serial;
 
-public class UnknownVaccineKeyException extends Exception{
+public class UnknownTreeKeyException extends Exception {
     private final String _keyId;
     
     //@Serial
     //private static final long serialVersionUID = ;
 
-    public UnknownVaccineKeyException(String keyId) {
+    public UnknownTreeKeyException(String keyId) {
         this._keyId = keyId;
     }
 
