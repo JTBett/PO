@@ -1,5 +1,9 @@
 package hva.habitats;
 
+import hva.util.Visitable;
+import hva.util.Visitor;
+
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.Map;
 import java.util.TreeMap;
@@ -10,7 +14,7 @@ import hva.employees.Zookeeper;
 import hva.seasons.Season;
 import hva.trees.Trees;
 
-public class Habitat {
+public class Habitat implements Serializable,Visitable {
 
     private String _keyIdHabitat;
 
@@ -211,15 +215,9 @@ public class Habitat {
 
         return work;
     }
-
     @Override
-    public String toString(){
-        return new StringJoiner("|")
-            .add("HABITAT")
-            .add(Integer.toString(_keyIdHabitat))
-            .add(_name)
-            .add(Integer.toString(_area))
-            .toString();
-    }
+    public <T> T accept(Visitor<T> visitor) {
+      return visitor.visit(this);
+    }      
 
 }

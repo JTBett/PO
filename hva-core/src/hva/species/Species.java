@@ -1,5 +1,7 @@
 package hva.species;
 
+import hva.util.Visitable;
+import hva.util.Visitor;
 import java.util.Collection;
 import java.util.Map;
 import java.util.TreeMap;
@@ -10,7 +12,7 @@ import java.io.Serializable;
 import hva.animals.Animal;
 import hva.employees.Vet;
 
-public class Species implements Serializable{
+public class Species implements Serializable,Visitable{
 
     //@Serial
     //private static final long serialVersionUID = ;
@@ -87,12 +89,8 @@ public class Species implements Serializable{
     }
 
     @Override
-    public String visit(Species s){
-        return new StringJoiner("|")
-            .add("ESPÉCIES")
-            .add(Integer.toString(_keyIdSpecies))
-            .add(_name)
-            .toString();
-    }
+    public <T> T accept(Visitor<T> visitor) {
+      return visitor.visit(this);
+    }  
 
 }

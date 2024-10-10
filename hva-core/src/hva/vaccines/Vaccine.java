@@ -3,6 +3,8 @@ package hva.vaccines;
 import java.io.Serializable;
 //import java.io.Serial;
 
+import hva.util.Visitable;
+import hva.util.Visitor;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.StringJoiner;
@@ -10,7 +12,7 @@ import java.util.StringJoiner;
 import hva.animals.Animal;
 import hva.species.Species;
 
-public class Vaccine implements Serializable{
+public class Vaccine implements Serializable,Visitable{
     
     //@Serial
     //private static final long serialVersionUID = ;
@@ -64,12 +66,8 @@ public class Vaccine implements Serializable{
     }
 
     @Override
-    public String toString(){
-        return new StringJoiner("|")
-            .add("VACINA")
-            .add(Integer.toString(_keyIdVaccine))
-            .add(_name)
-            .toString();
-    }
+    public <T> T accept(Visitor<T> visitor) {
+      return visitor.visit(this);
+    }  
 
 }

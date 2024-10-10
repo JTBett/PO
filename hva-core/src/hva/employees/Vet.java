@@ -1,5 +1,7 @@
 package hva.employees;
 
+import hva.util.Visitable;
+import hva.util.Visitor;
 import java.util.Collection;
 import java.util.Map;
 import java.util.TreeMap;
@@ -58,12 +60,4 @@ public class Vet extends Employee {
         return this.getSatisfactionStrategy().calcSatisfaction();
     }
     
-    @Override
-    public String toString(){
-        return new StringJoiner("|")
-            .add("VETERINÁRIO")
-            .add(super.toString())
-            .toString();
-    }
-
 }

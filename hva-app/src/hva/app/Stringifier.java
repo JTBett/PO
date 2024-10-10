@@ -7,6 +7,8 @@ import hva.species.Species;
 import hva.habitats.Habitat;
 import hva.vaccines.Vaccine;
 
+import hva.util.Visitor;
+
 import java.util.StringJoiner;
 
 public class Stringifier extends Visitor<String> {
@@ -33,9 +35,8 @@ public class Stringifier extends Visitor<String> {
     }
 
     @Override
-    public String visit(Vet v){
+    public String visit(Employee e){
         return new StringJoiner("|")
-            .add("VETERINÁRIO")
             .add(Integer.toString(v.getKeyId()))
             .add(v.getName())
             .add(Integer.toString(v.getSpeciesId()))
@@ -43,13 +44,13 @@ public class Stringifier extends Visitor<String> {
     }
 
     @Override
+    public String visit(Vet v){
+        return "VETERINÁRIO|" + this.visit( (Employee) v); 
+    }
+
+    @Override
     public String visit(Zookeeper z){
-        return new StringJoiner("|")
-            .add("TRATADOR")
-            .add(Integer.toString(z.getKeyId()))
-            .add(z.getName())
-            .add(Integer.toString(z.getSpeciesId()))
-            .toString();
+        return "TRATADOR|" + this.visit((Employee) z);
     }
 
     @Override
@@ -63,7 +64,7 @@ public class Stringifier extends Visitor<String> {
     }
 
     @Override
-    public String visit(Vaccinet v){
+    public String visit(Vaccine v){
         return new StringJoiner("|")
             .add("VACINA")
             .add(Integer.toString(v.getKeyId()))

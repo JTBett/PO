@@ -1,10 +1,12 @@
 package hva.employees;
 
+import hva.util.Visitable;
+import hva.util.Visitor;
 import hva.satisfactionStrategies.SatisfactionStrategy;
 
 import java.util.StringJoiner;
 
-public abstract class Employee {
+public abstract class Employee implements Serializable,Visitable{
 
     private String _keyIdEmployee;
 
@@ -39,11 +41,8 @@ public abstract class Employee {
     public abstract void removeResponsability(String responsabilityId);
 
     @Override
-    public String toString(){
-        return new StringJoiner("|")
-            .add(Integer.toString(_keyIdEmployee))
-            .add(_name)
-            .toString();
-    }
-
+    public <T> T accept(Visitor<T> visitor) {
+      return visitor.visit(this);
+    }  
+    
 }

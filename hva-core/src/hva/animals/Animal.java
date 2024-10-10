@@ -3,6 +3,8 @@ package hva.animals;
 //import java.io.Serial;
 import java.io.Serializable;
 
+import hva.util.Visitable;
+import hva.util.Visitor;
 import hva.habitats.Habitat;
 import hva.satisfactionStrategies.AnimalSatisfactionStrategy;
 import hva.satisfactionStrategies.SatisfactionStrategy;
@@ -10,7 +12,7 @@ import hva.satisfactionStrategies.SatisfactionStrategy;
 import java.util.StringJoiner;
 
 
-public class Animal implements Serializable{
+public class Animal implements Serializable,Visitable{
     
     //@Serial
     //private static final long serialVersionUID = ;
@@ -63,14 +65,7 @@ public class Animal implements Serializable{
     }
 
     @Override
-    public String toString(){
-        return new StringJoiner("|")
-        .add("ANIMAL")
-        .add(Integer.toString(_keyIdAnimal))
-        .add(_name)
-        .add(Integer.toString(_speciesId))
-        .add(Integer.toString(_habitat))
-        .toString();
-    }
-
+    public <T> T accept(Visitor<T> visitor) {
+      return visitor.visit(this);
+    }    
 }

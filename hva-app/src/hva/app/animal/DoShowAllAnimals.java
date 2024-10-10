@@ -1,6 +1,7 @@
 package hva.app.animal;
 
 import hva.Hotel;
+import hva.app.Stringifier;
 import pt.tecnico.uilib.menus.Command;
 import pt.tecnico.uilib.menus.CommandException;
 
@@ -13,9 +14,11 @@ class DoShowAllAnimals extends Command<Hotel> {
         super(Label.SHOW_ALL_ANIMALS, receiver);
     }
 
-    /** @see pt.tecnico.uilib.menu.Command#execute() */
     @Override
-    protected final void execute() {
-        _display.popup(_receiver.animals());
+    protected void execute() throws CommandException{
+        _receiver.getAllAnimals()
+            .stream()
+            .map(v -> v.accept(stringifier))
+            .forEach(_display::popup);
     }
 }

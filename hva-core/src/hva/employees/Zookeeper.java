@@ -1,5 +1,7 @@
 package hva.employees;
 
+import hva.util.Visitable;
+import hva.util.Visitor;
 import java.util.Collection;
 import java.util.Map;
 import java.util.TreeMap;
@@ -57,14 +59,6 @@ public class Zookeeper extends Employee {
     @Override
     public int calcSatisfaction() {
         return this.getSatisfactionStrategy().calcSatisfaction();
-    }
-
-    @Override
-    public String toString(){
-        return new StringJoiner("|")
-            .add("TRATADOR")
-            .add(super.toString())
-            .toString();
     }
 
 }
