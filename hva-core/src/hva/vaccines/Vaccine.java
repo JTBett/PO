@@ -5,6 +5,7 @@ import java.io.Serializable;
 
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.StringJoiner;
 
 import hva.animals.Animal;
 import hva.species.Species;
@@ -61,4 +62,14 @@ public class Vaccine implements Serializable{
         //TODO: create switch case
         return "";
     }
+
+    @Override
+    public String toString(){
+        return new StringJoiner("|")
+            .add("VACINA")
+            .add(Integer.toString(_keyIdVaccine))
+            .add(_name)
+            .toString();
+    }
+
 }

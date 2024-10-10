@@ -7,6 +7,8 @@ import hva.habitats.Habitat;
 import hva.satisfactionStrategies.AnimalSatisfactionStrategy;
 import hva.satisfactionStrategies.SatisfactionStrategy;
 
+import java.util.StringJoiner;
+
 
 public class Animal implements Serializable{
     
@@ -58,6 +60,17 @@ public class Animal implements Serializable{
      */    
     public void changeHabitat(Habitat habitat) {
 
+    }
+
+    @Override
+    public String toString(){
+        return new StringJoiner("|")
+        .add("ANIMAL")
+        .add(Integer.toString(_keyIdAnimal))
+        .add(_name)
+        .add(Integer.toString(_speciesId))
+        .add(Integer.toString(_habitat))
+        .toString();
     }
 
 }

@@ -2,6 +2,8 @@ package hva.employees;
 
 import hva.satisfactionStrategies.SatisfactionStrategy;
 
+import java.util.StringJoiner;
+
 public abstract class Employee {
 
     private String _keyIdEmployee;
@@ -35,4 +37,13 @@ public abstract class Employee {
     public abstract void addResponsability(Object responsability);
 
     public abstract void removeResponsability(String responsabilityId);
+
+    @Override
+    public String toString(){
+        return new StringJoiner("|")
+            .add(Integer.toString(_keyIdEmployee))
+            .add(_name)
+            .toString();
+    }
+
 }

@@ -1,7 +1,6 @@
 package hva.app.habitat;
 
 import hva.Hotel;
-import hva.app.Stringifier;
 import pt.tecnico.uilib.menus.Command;
 import pt.tecnico.uilib.menus.CommandException;
 
@@ -13,11 +12,9 @@ class DoShowAllHabitats extends Command<Hotel> {
         super(Label.SHOW_ALL_HABITATS, receiver);
     }
 
+    /** @see pt.tecnico.uilib.menu.Command#execute() */
     @Override
-    protected void execute() throws CommandException{
-        _receiver.getAllHabitats()
-            .stream()
-            .map(v -> v.accept(stringifier))
-            .forEach(_display::popup);
+    protected final void execute() {
+        _display.popup(_receiver.habitats());
     }
 }

@@ -3,6 +3,7 @@ package hva.employees;
 import java.util.Collection;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.StringJoiner;
 
 import hva.habitats.Habitat;
 import hva.satisfactionStrategies.ZookeperSatisfactionStrategy;
@@ -57,4 +58,13 @@ public class Zookeeper extends Employee {
     public int calcSatisfaction() {
         return this.getSatisfactionStrategy().calcSatisfaction();
     }
+
+    @Override
+    public String toString(){
+        return new StringJoiner("|")
+            .add("TRATADOR")
+            .add(super.toString())
+            .toString();
+    }
+
 }

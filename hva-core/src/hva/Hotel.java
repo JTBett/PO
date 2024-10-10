@@ -8,6 +8,7 @@ import java.io.Serial;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -593,6 +594,50 @@ public class Hotel implements Serializable {
     }
     /*------------------------REGISTRATION FUNCTIONS--------------------END--*/
 
+    /**
+    * Return all the species as an unmodifiable collection.
+    * 
+    * @return a collection with all the species.
+    */
+    public Collection<Species> species() {
+        return Collections.unmodifiableCollection(_species.values());
+    }
+
+    /**
+    * Return all the animals as an unmodifiable collection.
+    * 
+    * @return a collection with all the animals.
+    */
+    public Collection<Animal> animals() {
+        return Collections.unmodifiableCollection(_animals.values());
+    }
+
+    /**
+    * Return all the employees as an unmodifiable collection.
+    * 
+    * @return a collection with all the employees.
+    */
+    public Collection<Employee> employees() {
+        return Collections.unmodifiableCollection(_employees.values());
+    }
+
+    /**
+    * Return all the habitats as an unmodifiable collection.
+    * 
+    * @return a collection with all the habitats.
+    */
+    public Collection<Habitat> habitats() {
+        return Collections.unmodifiableCollection(_habitats.values());
+    }
+    
+    /**
+    * Return all the vaccines as an unmodifiable collection.
+    * 
+    * @return a collection with all the vaccines.
+    */
+    public Collection<Vaccine> vaccines() {
+        return Collections.unmodifiableCollection(_vaccines.values());
+    }
         
     /*--START--------------------LOOKUP FUNCTIONS----------------------------*/
     

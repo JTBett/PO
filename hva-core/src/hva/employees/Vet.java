@@ -3,6 +3,7 @@ package hva.employees;
 import java.util.Collection;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.StringJoiner;
 
 import hva.satisfactionStrategies.VetSatisfactionStrategy;
 import hva.species.Species;
@@ -57,4 +58,12 @@ public class Vet extends Employee {
         return this.getSatisfactionStrategy().calcSatisfaction();
     }
     
+    @Override
+    public String toString(){
+        return new StringJoiner("|")
+            .add("VETERINÁRIO")
+            .add(super.toString())
+            .toString();
+    }
+
 }

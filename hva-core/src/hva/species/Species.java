@@ -3,6 +3,7 @@ package hva.species;
 import java.util.Collection;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.StringJoiner;
 //import java.io.Serial;
 import java.io.Serializable;
 
@@ -83,6 +84,15 @@ public class Species implements Serializable{
      */    
     public void addAnimaltoSpecies(Animal animal) {
         this._animalsofSpecies.put(animal.getKeyId(), animal);
+    }
+
+    @Override
+    public String visit(Species s){
+        return new StringJoiner("|")
+            .add("ESPÉCIES")
+            .add(Integer.toString(_keyIdSpecies))
+            .add(_name)
+            .toString();
     }
 
 }

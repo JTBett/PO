@@ -3,6 +3,7 @@ package hva.habitats;
 import java.util.Collection;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.StringJoiner;
 
 import hva.animals.Animal;
 import hva.employees.Zookeeper;
@@ -210,4 +211,15 @@ public class Habitat {
 
         return work;
     }
+
+    @Override
+    public String toString(){
+        return new StringJoiner("|")
+            .add("HABITAT")
+            .add(Integer.toString(_keyIdHabitat))
+            .add(_name)
+            .add(Integer.toString(_area))
+            .toString();
+    }
+
 }
